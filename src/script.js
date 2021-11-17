@@ -1,4 +1,3 @@
-
 // Image pixel measurements
 const boxLength = 98;
 const borderSize = 1;
@@ -7,8 +6,9 @@ const gridWidth = 23;
 const gridHeight = 10;
 
 const templateLocation = "/resources/template modified.png";
-const image = document.getElementById("mainImage");
 const tableDiv = document.getElementById("tableDiv");
+
+var table;
 
 const colHeaders = 
 ["", "Normal", "Fire", "Water", "Grass", "Electric", "Ice", "Fighting", "Poision",
@@ -42,30 +42,9 @@ function coordToPixel(x, y) {
     return [xCoord, yCoord];
 }
 
-/*
-var xVal = 0;
-
-// TODO XY Coord to image map in images?
-images = [ {src: image.src} ];
-
-function render() {
-
-    console.log("rendering");
-
-    var coords = coordToPixel(xVal, 0);
-    images.push({ src:'/ignore/test.png', x: coords[0], y: coords[1]});
-    xVal++;
-
-
-    mergeImages(images).then(b64 => image.src = b64);
-}
-
-*/
 
 // Initialize tableDiv
-tableOutput = "<table>\n";
-
-// Create Headings
+tableOutput = "<table id=\"mainTable\">\n";
 
 // Create rest of table
 for(row = 0; row < gridHeight; row++) {
@@ -75,28 +54,16 @@ for(row = 0; row < gridHeight; row++) {
         if (row + col == 0) {
             tableOutput += "<th></th>";
         } else if (row == 0) {
+            // Create Vertical Headings
             tableOutput += "<th>" + colHeaders[col] + "</th>";
         } else if (col == 0) {
+            // Create Horizontal Headings
             tableOutput += "<th>" + rowHeaders[row] + "</th>";
         } else {
-            tableOutput += "<td><input type=\"text\" class=\"content\"></td>";
+            // Create Inner Cells
+            // Each inner cell input tag has an id "row col"
+            tableOutput += "<td><input type=\"text\" class=\"content\" id=\"" + row + " " + col + "\" ></td>";
         }
-
-        /*
-        // Row and Col 0 are headers
-        if( row == 0 || col == 0) {
-
-            // If row + col == 0, then the position is 0,0. Ignore
-            if (row + col != 0) {
-                tableOutput += "<th>Testtttttt</th>";
-            } else {
-                tableOutput += "<th></th>";
-            }
-
-        } else {
-            tableOutput += "<td><input type=\"text\" class=\"content\"></td>";
-        }
-        */
         
     }   
     tableOutput += "</tr>\n";
@@ -104,5 +71,28 @@ for(row = 0; row < gridHeight; row++) {
 tableOutput += "</table>";
 tableDiv.innerHTML = tableOutput;
 
+table = document.getElementById("mainTable");
 
 
+// Returns a 2 dimensional list of all cell values in the input table ([row][column])
+function getCellValues() {
+    var output = [];
+
+    // Row and Col start as 1 because we want to skip the headers
+    for (var row = 1; row < table.rows.length; row++) {
+        var outputRow = [];
+
+        for (var col = 1; col < table.rows[row].cells.length; col++) {
+
+            // Every cell accessed is an <input> tag
+            // Each input tag has an id "row col"
+            var element = document.getElementById(row + " " + col);
+            outputRow.push(element.value);
+           
+        }
+
+        output.push(outputRow);
+    }
+
+    return output;
+}
