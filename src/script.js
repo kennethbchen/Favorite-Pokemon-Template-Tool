@@ -8,6 +8,9 @@ const gridHeight = 10;
 const testImageLocation = "/ignore/test2.png";
 const templateLocation = "/resources/template modified.png";
 
+// In ignore folder for testing
+const imagesLocation = "/ignore/all/";
+
 const tableDiv = document.getElementById("tableDiv");
 const mainImageTag = document.getElementById("mainImage");
 
@@ -19,7 +22,7 @@ const colHeaders =
  "Steel", "Fairy", "Starter", "Mega", "Legend", "Favorite"];
 
 const rowHeaders =
-["", "I", "II", "III", "IV", "V", "VI", "VII", "VII", "Favorite"]
+["", "I (1)", "II (2)", "III (3)", "IV (4)", "V (5)", "VI (6)", "VII (7)", "VII (8)", "Favorite"]
 
 // Initialize tableDiv
 tableOutput = "<table id=\"mainTable\">\n";
@@ -101,6 +104,78 @@ function getCellValues() {
     return output;
 }
 
+// https://stackoverflow.com/questions/175739/built-in-way-in-javascript-to-check-if-a-string-is-a-valid-number
+function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!  
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+           !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+  }
+
+// Takes an input string representing a Pokemon and translates that to the corresponding image
+/*  
+    ------ Image File Rules ------
+
+    [] - Required
+    () - Optional
+    [Dex Number]_(form id)_(m/f)_(g/n)
+    variant id (0->...) - Regional variants, Megas, or other. Default 0
+    m/f - Male / Female form.
+    g/n - Form Gigantimax / Normal. Default Normal
+
+    // TODO: Alcremie is a special case
+    // TODO: Consolidate form and variant id?
+
+    For Example: 
+    6_2_n.png
+
+    ------ Example input ------
+    38 -> (Translated to 38_0_n)
+    6_2_n
+    6_0_g
+
+    TODO: hopefully selection system instead of text input
+    TODO: maybe better image naming system
+*/
+function getImagePathFromInput(input) {
+    values = input.split("_");
+
+    dexNumber = -1;
+    formID = 0;
+    gender = "";
+    form = "_n";
+
+    for( i = 0; i < values.length; i++) {
+
+        // Assign each value
+        if (isNumeric(values[i])){
+
+            if (dexNumber == -1) {
+                // The first number is always interpreted as the dex number
+                dexNumber = parseInt(values[i]);
+            } else {
+                // Every number after that sets formID
+                formID = parseInt(values[i]);
+            }
+        } else {
+
+            switch(values[i]) {
+                case ("g"): // Gigantimax / Normal
+                case ("n"):
+                form = "_" + values[i];
+                break;
+                case ("m"): // Male / Female
+                case ("f"):
+                gender = "_" + values[i];
+                break;
+            }
+        }
+
+    }
+
+    return imagesLocation + dexNumber + "_" + formID + gender + form + ".png";
+
+}
+
 // Takes the input values from the data and renders the final image
 function renderImage() {
     var tableData = getCellValues();
@@ -118,7 +193,7 @@ function renderImage() {
                 coordinates = coordToPixel(row + 1, col + 1);
 
                 // Todo, translation between table data and image
-                imageData.push({src: testImageLocation, x: coordinates[0], y: coordinates[1]});
+                imageData.push({src: getImagePathFromInput(tableData[row][col]), x: coordinates[0], y: coordinates[1]});
             }
         }
     }
