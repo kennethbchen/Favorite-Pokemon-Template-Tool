@@ -1,3 +1,5 @@
+"use strict";
+
 // Image pixel measurements
 const boxLength = 98;
 const borderSize = 1;
@@ -11,8 +13,8 @@ const templateLocation = "/resources/template modified.png";
 // In ignore folder for testing
 const imagesLocation = "/ignore/all/";
 
-const tableDiv = document.getElementById("tableDiv");
-const mainImageTag = document.getElementById("mainImage");
+var tableDiv = $("#tableDiv");
+const mainImageTag = $("#mainImage");
 
 var table;
 
@@ -25,35 +27,37 @@ const rowHeaders =
 ["", "I (1)", "II (2)", "III (3)", "IV (4)", "V (5)", "VI (6)", "VII (7)", "VII (8)", "Favorite"]
 
 // Initialize tableDiv
-tableOutput = "<table id=\"mainTable\">\n";
+tableDiv.append($("<table>").attr("id", "mainTable"));
 
 // Create rest of table
-for(row = 0; row < gridHeight; row++) {
-    tableOutput += "<tr>\n";
-    for(col = 0; col < gridWidth; col++) {
+for(var row = 0; row < gridHeight; row++) {
+    var tableRow = $("<tr>");
 
+    for(var col = 0; col < gridWidth; col++) {
+        
         if (row + col == 0) {
             // Handle Top left cell
-            tableOutput += "<th></th>";
+            tableRow.append($("<th>"));
         } else if (row == 0) {
             // Create Vertical Headings
-            tableOutput += "<th>" + colHeaders[col] + "</th>";
+            tableRow.append($("<th>").text(colHeaders[col]));
         } else if (col == 0) {
             // Create Horizontal Headings
-            tableOutput += "<th>" + rowHeaders[row] + "</th>";
+            tableRow.append($("<th>").text(rowHeaders[row]));
         } else {
             // Create Inner Cells
             // Each inner cell input tag has an id "row col"
-            tableOutput += "<td><input type=\"text\" class=\"content\" id=\"" + row + " " + col + "\" ></td>";
+            var data = $("<td>");
+            var input = $("<input>").attr("type", "text").attr("class", "content").attr("id", row + " " + col);
+            data.append(input);
+            tableRow.append(data);
         }
+
+        
         
     }   
-    tableOutput += "</tr>\n";
+    $("#mainTable").append(tableRow);
 }
-tableOutput += "</table>";
-tableDiv.innerHTML = tableOutput;
-
-table = document.getElementById("mainTable");
 
 
 // Starts top left at (0,0)
@@ -80,6 +84,8 @@ function coordToPixel(row, col) {
     return [xCoord, yCoord];
 }
 
+
+table = document.getElementById("mainTable");
 
 // Returns a 2 dimensional list of all cell values in the input table ([row][column])
 function getCellValues() {
@@ -137,14 +143,14 @@ function isNumeric(str) {
     TODO: maybe better image naming system
 */
 function getImagePathFromInput(input) {
-    values = input.split("_");
+    var values = input.split("_");
 
-    dexNumber = -1;
-    formID = 0;
-    gender = "";
-    form = "_n";
+    var dexNumber = -1;
+    var formID = 0;
+    var gender = "";
+    var form = "_n";
 
-    for( i = 0; i < values.length; i++) {
+    for(var i = 0; i < values.length; i++) {
 
         // Assign each value
         if (isNumeric(values[i])){
@@ -190,7 +196,7 @@ function renderImage() {
         for (var col = 0; col < tableData[row].length; col++) {
 
             if (tableData[row][col] !== "") {
-                coordinates = coordToPixel(row + 1, col + 1);
+                var coordinates = coordToPixel(row + 1, col + 1);
 
                 // Todo, translation between table data and image
                 imageData.push({src: getImagePathFromInput(tableData[row][col]), x: coordinates[0], y: coordinates[1]});
@@ -198,5 +204,5 @@ function renderImage() {
         }
     }
 
-    mergeImages(imageData).then(b64 => mainImageTag.src = b64);
+    mergeImages(imageData).then(b64 => mainImageTag.attr("src", b64));
 }
