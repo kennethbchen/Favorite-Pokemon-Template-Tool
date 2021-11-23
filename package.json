@@ -1,0 +1,25 @@
+{
+  "name": "pkmnfavtemplatetool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kennethbchen/Favorite-Pokemon-Template-Tool.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kennethbchen/Favorite-Pokemon-Template-Tool/issues"
+  },
+  "homepage": "https://github.com/kennethbchen/Favorite-Pokemon-Template-Tool#readme",
+  "dependencies": {
+    "merge-images": "^2.0.0"
+  }
+}
