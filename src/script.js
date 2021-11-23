@@ -7,7 +7,6 @@ const borderSize = 1;
 const gridWidth = 23;
 const gridHeight = 10;
 
-const testImageLocation = "/ignore/test2.png";
 const templateLocation = "/resources/template modified.png";
 
 // In ignore folder for testing
@@ -147,7 +146,7 @@ function getImagePathFromInput(input) {
 
     var dexNumber = -1;
     var formID = 0;
-    var gender = "";
+    var gender = "_n";
     var form = "_n";
 
     for(var i = 0; i < values.length; i++) {
@@ -206,3 +205,4 @@ function renderImage() {
 
     mergeImages(imageData).then(b64 => mainImageTag.attr("src", b64));
 }
+window.renderImage = renderImage;
