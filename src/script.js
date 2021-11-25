@@ -4,29 +4,53 @@
 const boxLength = 98;
 const borderSize = 1;
 
+// Main template grid dimensions
 const gridWidth = 23;
 const gridHeight = 10;
 
 const templateLocation = "/resources/template modified.png";
+const dataLocation = "/ignore/pokemon_data_simple.csv";
+
+// Array containing CSV data from dataLocation
+var data;
 
 // In ignore folder for testing
 const imagesLocation = "/ignore/all/";
 
-var tableDiv = $("#tableDiv");
+// Div containing the main input table
+const tableDiv = $("#tableDiv");
+
+// The input table itself
+var inputTable;
+
 const mainImageTag = $("#mainImage");
 
-var table;
-
+// Column headers of the table
 const colHeaders = 
-["", "Normal", "Fire", "Water", "Grass", "Electric", "Ice", "Fighting", "Poision",
+["", "Normal", "Fire", "Water", "Grass", "Electric", "Ice", "Fighting", "Poison",
  "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark",
  "Steel", "Fairy", "Starter", "Mega", "Legend", "Favorite"];
 
+ // Row Headers of the table
 const rowHeaders =
 ["", "I (1)", "II (2)", "III (3)", "IV (4)", "V (5)", "VI (6)", "VII (7)", "VII (8)", "Favorite"]
 
+// ------------------------------------
+
+
+// Load the CSV Data and parse it
+$.ajax({
+    url: dataLocation,
+    dataType: "text",
+}).done(function(d) {
+    data = d3.csvParse(d);
+});
+
+
 // Initialize tableDiv
 tableDiv.append($("<table>").attr("id", "mainTable"));
+
+inputTable = $("#mainTable");
 
 // Create rest of table
 for(var row = 0; row < gridHeight; row++) {
@@ -47,20 +71,20 @@ for(var row = 0; row < gridHeight; row++) {
             // Create Inner Cells
             // Each inner cell input tag has an id "row col"
             var data = $("<td>");
-            var input = $("<input>").attr("type", "text").attr("class", "content").attr("id", row + " " + col);
+            var input = $("<input>").attr("type", "button").attr("class", "content").attr("onClick", "filterData(" + row + ", " + col + ")");
             data.append(input);
             tableRow.append(data);
         }
 
-        
-        
     }   
+    
     $("#mainTable").append(tableRow);
 }
 
 
 // Starts top left at (0,0)
 // Gives top left pixel coordinate of box [x,y]
+// This is used for placing the selected images on the template
 function coordToPixel(row, col) {
     // Total length from borders
     var borderX = col * borderSize + 1;
@@ -83,18 +107,18 @@ function coordToPixel(row, col) {
     return [xCoord, yCoord];
 }
 
-
-table = document.getElementById("mainTable");
+/*
+ TODO: Fix this stuff
 
 // Returns a 2 dimensional list of all cell values in the input table ([row][column])
 function getCellValues() {
     var output = [];
 
     // Row and Col start as 1 because we want to skip the headers
-    for (var row = 1; row < table.rows.length; row++) {
+    for (var row = 1; row < inputTable.rows.length; row++) {
         var outputRow = [];
 
-        for (var col = 1; col < table.rows[row].cells.length; col++) {
+        for (var col = 1; col < inputTable.rows[row].cells.length; col++) {
 
             // Every cell accessed is an <input> tag
             // Each input tag has an id "row col"
@@ -107,78 +131,6 @@ function getCellValues() {
     }
 
     return output;
-}
-
-// https://stackoverflow.com/questions/175739/built-in-way-in-javascript-to-check-if-a-string-is-a-valid-number
-function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!  
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-           !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
-  }
-
-// Takes an input string representing a Pokemon and translates that to the corresponding image
-/*  
-    ------ Image File Rules ------
-
-    [] - Required
-    () - Optional
-    [Dex Number]_(form id)_(m/f)_(g/n)
-    variant id (0->...) - Regional variants, Megas, or other. Default 0
-    m/f - Male / Female form.
-    g/n - Form Gigantimax / Normal. Default Normal
-
-    // TODO: Alcremie is a special case
-    // TODO: Consolidate form and variant id?
-
-    For Example: 
-    6_2_n.png
-
-    ------ Example input ------
-    38 -> (Translated to 38_0_n)
-    6_2_n
-    6_0_g
-
-    TODO: hopefully selection system instead of text input
-    TODO: maybe better image naming system
-*/
-function getImagePathFromInput(input) {
-    var values = input.split("_");
-
-    var dexNumber = -1;
-    var formID = 0;
-    var gender = "_n";
-    var form = "_n";
-
-    for(var i = 0; i < values.length; i++) {
-
-        // Assign each value
-        if (isNumeric(values[i])){
-
-            if (dexNumber == -1) {
-                // The first number is always interpreted as the dex number
-                dexNumber = parseInt(values[i]);
-            } else {
-                // Every number after that sets formID
-                formID = parseInt(values[i]);
-            }
-        } else {
-
-            switch(values[i]) {
-                case ("g"): // Gigantimax / Normal
-                case ("n"):
-                form = "_" + values[i];
-                break;
-                case ("m"): // Male / Female
-                case ("f"):
-                gender = "_" + values[i];
-                break;
-            }
-        }
-
-    }
-
-    return imagesLocation + dexNumber + "_" + formID + gender + form + ".png";
-
 }
 
 // Takes the input values from the data and renders the final image
@@ -197,7 +149,7 @@ function renderImage() {
             if (tableData[row][col] !== "") {
                 var coordinates = coordToPixel(row + 1, col + 1);
 
-                // Todo, translation between table data and image
+                // Todo, use selections based on filtered CSV input
                 imageData.push({src: getImagePathFromInput(tableData[row][col]), x: coordinates[0], y: coordinates[1]});
             }
         }
@@ -205,4 +157,70 @@ function renderImage() {
 
     mergeImages(imageData).then(b64 => mainImageTag.attr("src", b64));
 }
+
 window.renderImage = renderImage;
+
+*/
+
+function renderImage() {
+    console.log("not yet implemented");
+}
+
+// Gets an appropriate filter based on the position in the template.
+// For example, on the "Normal" column, gets a filter that selects for normal types
+// Starter, Mega, and Legend filtering not implemented
+function getFilterFromPos(row, col) {
+    var output = {};
+
+    // Filter column by type / other
+    switch(col) {
+        case 21: // Legend column, filter not implemented
+        case 20: // Mega column, filter not implemented
+        case 19: // Starter column filter not implemented
+        case gridWidth - 1: // Favorite row, no filter
+        case 0: // Header Row, invalid
+            break;
+        default:
+            output.type = colHeaders[col].toLowerCase(); 
+            break;
+    }
+
+
+    // Filter by generation
+    switch(row) {
+        case gridHeight - 1: // Favorite row, no filter
+        case 0: // Header row, invalid
+            break;
+        default:
+            output.gen = row;
+            break;
+    }
+
+    return output;
+    
+}
+
+// Filter the CSV data
+function getFilteredData(data, filter) {
+    var output;
+
+    output = data.filter(function(row) {
+        
+        // If there is a type filter, then use it, else all types are allowed
+        var typeMatch = (filter.type == null ? true : row.type_1 == filter.type || row.type_2 == filter.type);
+
+        // If there is a gen filter, then use it, else all gens are allowed
+        var genMatch = (filter.gen == null ? true : row.gen == filter.gen);
+
+        return typeMatch && genMatch;
+
+    });
+
+    return output;
+}
+
+function filterData(row, col) {
+    console.log(getFilteredData(data, getFilterFromPos(row,col)));
+}
+
+
