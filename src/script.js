@@ -20,6 +20,12 @@ const imagesLocation = "/ignore/all/";
 // Div containing the main input table
 const tableDiv = $("#tableDiv");
 
+// Div containing the menu overlay. Essentially the background of the overlay
+const overlayDiv = $("#overlay");
+
+// Div containing the actual content of the menu overlay.
+const overlayContent = $("#overlayContent");
+
 // The input table itself
 var inputTable;
 
@@ -162,6 +168,8 @@ window.renderImage = renderImage;
 
 */
 
+
+
 function renderImage() {
     console.log("not yet implemented");
 }
@@ -200,6 +208,8 @@ function getFilterFromPos(row, col) {
     
 }
 
+
+
 // Filter the CSV data
 function getFilteredData(data, filter) {
     var output;
@@ -219,8 +229,26 @@ function getFilteredData(data, filter) {
     return output;
 }
 
+// Set up overlay click events
+
+// Only close the overlay if the background (and not the content of the menu) is clicked
+overlayDiv.click( function(event) {
+    if (event.target.id == "overlay") {
+        hideOverlay();
+    }
+})
+
+function hideOverlay() {
+    overlayDiv.attr("class", "overlay disabled");
+}
+
+function showOverlay() {
+    overlayDiv.attr("class", "overlay");
+}
+
 function filterData(row, col) {
-    console.log(getFilteredData(data, getFilterFromPos(row,col)));
+    var filteredData = getFilteredData(data, getFilterFromPos(row,col));
+    showOverlay();
 }
 
 
