@@ -1,8 +1,10 @@
-#tableDiv {
+h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
 }
 
 table {
-    max-width: 100%;
+    width: 20%;
 }
 
 td {
@@ -23,7 +25,7 @@ td:after {
     margin-top: 100%;
 }
 
-td .content {
+.tableButton {
   width:100%;
   height:100%;
 
@@ -42,6 +44,8 @@ img {
     height: 100%;
     background-color: rgba(0,0,0, 0.5);
     z-index: 1;
+
+    
 }
 
 .overlayContent {
@@ -49,10 +53,20 @@ img {
     margin:auto;
     margin-top: 10%;
     width: 50%;
+    max-height:75%;
     z-index: 2;
     
+
+    
+    
+    
+}
+.scroll {
+    overflow-y: scroll;
 }
 
 .disabled {
     display:none;
+    
 }
+

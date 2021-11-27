@@ -7,16 +7,25 @@
 
 <body>
 
-<div id="overlay" class="overlay disabled">
-    <div id="overlayContent" class ="overlayContent">hi</div>
+    
+<div class="content">
+    <div id="overlay" class="overlay disabled">
+        <div id="overlayContent" class ="overlayContent scroll">
+            <h1>Menu</h1>
+            <input type="text" id="overlaySearchBar" onkeyup="searchSelectionTable();">
+            <div id="selectionDiv"></div>
+        </div>
+    </div>
+    
+    <div id="tableDiv">
+        <table id="mainTable"></table>
+    </div>
+    
+    <button type="button" onclick="renderImage()">Generate</button>
+    
+    <img src = "/resources/template modified.png" id="mainImage">    
+    
 </div>
-
-<div id="tableDiv">
-</div>
-
-<button type="button" onclick="renderImage()">Generate</button>
-
-<img src = "/resources/template modified.png" id="mainImage">
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-3.6.0.js"></script>

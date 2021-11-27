@@ -11,11 +11,12 @@ const gridHeight = 10;
 const templateLocation = "/resources/template modified.png";
 const dataLocation = "/ignore/pokemon_data_simple.csv";
 
-// Array containing CSV data from dataLocation
-var data;
-
 // In ignore folder for testing
 const imagesLocation = "/ignore/all/";
+
+// Array containing CSV data from dataLocation
+// Array of javascript objects
+var data;
 
 // Div containing the main input table
 const tableDiv = $("#tableDiv");
@@ -26,10 +27,18 @@ const overlayDiv = $("#overlay");
 // Div containing the actual content of the menu overlay.
 const overlayContent = $("#overlayContent");
 
-// The input table itself
-var inputTable;
+// Div that contains the selectable data for the overlay menu
+const selectionDiv = $("#selectionDiv");
 
-const mainImageTag = $("#mainImage");
+const selectionTable = $("#selectionTable");
+
+// The input field that is used to search in the overlay menu
+const overlaySearchBar = $("#overlaySearchBar");
+
+// The main input table itself
+const inputTable = $("#mainTable");
+
+const mainImage = $("#mainImage");
 
 // Column headers of the table
 const colHeaders = 
@@ -53,11 +62,6 @@ $.ajax({
 });
 
 
-// Initialize tableDiv
-tableDiv.append($("<table>").attr("id", "mainTable"));
-
-inputTable = $("#mainTable");
-
 // Create rest of table
 for(var row = 0; row < gridHeight; row++) {
     var tableRow = $("<tr>");
@@ -77,7 +81,7 @@ for(var row = 0; row < gridHeight; row++) {
             // Create Inner Cells
             // Each inner cell input tag has an id "row col"
             var data = $("<td>");
-            var input = $("<input>").attr("type", "button").attr("class", "content").attr("onClick", "filterData(" + row + ", " + col + ")");
+            var input = $("<input>").attr("type", "button").attr("class", "tableButton").attr("onClick", "filterData(" + row + ", " + col + ")");
             data.append(input);
             tableRow.append(data);
         }
@@ -210,9 +214,14 @@ function getFilterFromPos(row, col) {
 
 
 
-// Filter the CSV data
+// Filter the CSV data by type or generation
 function getFilteredData(data, filter) {
     var output;
+
+    // If there is no filter at all, don't bother filtering
+    if(Object.keys(filter).length == 0) {
+        return data;
+    }
 
     output = data.filter(function(row) {
         
@@ -230,24 +239,77 @@ function getFilteredData(data, filter) {
 }
 
 // Set up overlay click events
-
 // Only close the overlay if the background (and not the content of the menu) is clicked
-overlayDiv.click( function(event) {
+// Mousedown probably doesn't work on mobile
+overlayDiv.mousedown( function(event) {
     if (event.target.id == "overlay") {
         hideOverlay();
     }
 })
 
+
+// Searches the current filtered list of pokemon by hiding the elemnts that do not match the search query
+function searchSelectionTable() {
+
+    // Get all table row elements that are the list of pokemon in the overlay
+    var tableData = $("tr.tableData");
+
+    for(var i = 0; i < tableData.length; i++) {
+
+        if($(tableData[i]).attr("name").search(overlaySearchBar.val()) != -1) {
+
+            // The name matches, show it
+            $(tableData[i]).removeClass("disabled");
+        } else {
+
+            // The name does not match, hide it
+            $(tableData[i]).addClass("disabled");
+        }
+    }
+
+}
+
+// Creates a table for selecting an individual pokemon out of the list
+// Puts the table in outputDiv
+//
+function createSelectionTable(outputDiv, data) {
+
+    // Clear the outputDiv
+    outputDiv.empty();
+
+    // Clear search bar input
+    overlaySearchBar.value = "";
+
+    var outputTable = $("<table>");
+
+    for (var i = 0; i < data.length; i++) {
+        var row = $("<tr>").attr("name", data[i].identifier).attr("dex", data[i].dex_number).attr("class", "tableData");
+
+        var tableData = $("<td>").append($("<p>").html(data[i].identifier)).append($("<img>").attr("src", imagesLocation + data[i].file_name));
+
+        row.append(tableData);
+
+        outputTable.append(row);
+    }
+
+    outputDiv.append(outputTable);
+}
+
+
+
 function hideOverlay() {
     overlayDiv.attr("class", "overlay disabled");
+    overlaySearchBar.val("");
 }
 
 function showOverlay() {
     overlayDiv.attr("class", "overlay");
+    overlaySearchBar.focus();
 }
 
 function filterData(row, col) {
     var filteredData = getFilteredData(data, getFilterFromPos(row,col));
+    createSelectionTable(selectionDiv, filteredData);
     showOverlay();
 }
 
