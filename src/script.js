@@ -132,7 +132,6 @@ for (var row = 1; row < inputTable.rows.length; row++) {
     selectionData.push(newRow);
 }
 
-
 // Starts top left at (0,0)
 // Gives top left pixel coordinate of box [x,y]
 // This is used for placing the selected images on the template
@@ -158,35 +157,8 @@ function coordToPixel(row, col) {
     return [xCoord, yCoord];
 }
 
-/*
- TODO: Fix this stuff
-
-// Returns a 2 dimensional list of all cell values in the input table ([row][column])
-function getCellValues() {
-    var output = [];
-
-    // Row and Col start as 1 because we want to skip the headers
-    for (var row = 1; row < inputTable.rows.length; row++) {
-        var outputRow = [];
-
-        for (var col = 1; col < inputTable.rows[row].cells.length; col++) {
-
-            // Every cell accessed is an <input> tag
-            // Each input tag has an id "row col"
-            var element = document.getElementById(row + " " + col);
-            outputRow.push(element.value);
-           
-        }
-
-        output.push(outputRow);
-    }
-
-    return output;
-}
-
 // Takes the input values from the data and renders the final image
 function renderImage() {
-    var tableData = getCellValues();
 
     var imageData = [];
 
@@ -194,31 +166,22 @@ function renderImage() {
     imageData.push({src: templateLocation, x: 0, y:0});
 
     // Add images based on the table data
-    for(var row = 0; row < tableData.length; row++) {
-        for (var col = 0; col < tableData[row].length; col++) {
+    for(var row = 0; row < selectionData.length; row++) {
+        for (var col = 0; col < selectionData[row].length; col++) {
 
-            if (tableData[row][col] !== "") {
+            if (selectionData[row][col] !== "") {
 
                 // row and col are incremented because the table data doesn't include the headers
+                // So to properly get the coordinates, the headers need to be taken into account
                 var coordinates = coordToPixel(row + 1, col + 1);
 
                 // Todo, use selections based on filtered CSV input
-                imageData.push({src: getImagePathFromInput(tableData[row][col]), x: coordinates[0], y: coordinates[1]});
+                imageData.push({src: imagesLocation + selectionData[row][col], x: coordinates[0], y: coordinates[1]});
             }
         }
     }
 
-    mergeImages(imageData).then(b64 => mainImageTag.attr("src", b64));
-}
-
-window.renderImage = renderImage;
-
-*/
-
-
-
-function renderImage() {
-    console.log("not yet implemented");
+    mergeImages(imageData).then(b64 => mainImage.setAttribute("src", b64));
 }
 
 // Gets an appropriate filter based on the position in the template.
@@ -255,7 +218,6 @@ function getFilterFromPos(row, col) {
     
 }
 
-
 // Filter the CSV data by type or generation
 function getFilteredData(data, filter) {
     var output;
@@ -279,7 +241,6 @@ function getFilteredData(data, filter) {
 
     return output;
 }
-
 
 // Searches the current filtered list of pokemon by hiding the elemnts that do not match the search query
 function searchSelectionTable() {
@@ -346,8 +307,6 @@ function createSelectionTable(data, selectionCallback) {
 
 }
 
-
-
 function hideOverlay() {
     overlayDiv.classList.add("disabled");
 
@@ -368,7 +327,10 @@ function showSelectionOverlay(row, col) {
     var filteredData = getFilteredData(csvData, getFilterFromPos(row,col));
 
     createSelectionTable(filteredData, function(fileName) {
-        selectionData[row + 1][col + 1] = fileName;
+
+        // row and col are decremented by because they include the header
+        // selecitonData does not include headers so one row and one col is ignored
+        selectionData[row - 1][col - 1] = fileName;
         hideOverlay();
     });
 
@@ -391,4 +353,8 @@ overlayDiv.onmousedown = function(event) {
 
 selectionSearchBar.onkeyup = function () {
     searchSelectionTable();
+}
+
+function printSelectionData(){
+    console.log(selectionData);
 }
