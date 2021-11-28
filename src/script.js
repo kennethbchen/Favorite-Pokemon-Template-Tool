@@ -53,7 +53,11 @@ const rowHeaders =
 
 // Array containing CSV data from dataLocation
 // Array of javascript objects
-var data;
+var csvData;
+
+// 2D array containing the user's selected images for each cell
+// Each image is the image name as a string
+var selectionData = [];
 
 // ------------------------------------
 
@@ -61,7 +65,7 @@ var data;
 var request = new XMLHttpRequest();
 request.onreadystatechange = function() {
     if(request.readyState == XMLHttpRequest.DONE) {
-        data = d3.csvParse(request.responseText);
+        csvData = d3.csvParse(request.responseText);
     }
 }
 request.open("get", dataLocation, true);
@@ -102,16 +106,30 @@ for(var row = 0; row < gridHeight; row++) {
             input.setAttribute("onClick", "showSelectionOverlay(" + row + ", " + col + ")");
             input.classList.add("tableButton");
             
-            var data = document.createElement("td");
+            var csvData = document.createElement("td");
 
-            data.appendChild(input);
+            csvData.appendChild(input);
 
-            tableRow.appendChild(data);
+            tableRow.appendChild(csvData);
         }
 
     }   
     
     inputTable.appendChild(tableRow);
+}
+
+// Initalize selectionData based on the dimensions of the input table
+// Row and Col start as 1 because we want to skip the headers
+for (var row = 1; row < inputTable.rows.length; row++) {
+    var newRow = [];
+
+    for (var col = 1; col < inputTable.rows[row].cells.length; col++) {
+        
+        newRow.push("");
+       
+    }
+
+    selectionData.push(newRow);
 }
 
 
@@ -180,6 +198,8 @@ function renderImage() {
         for (var col = 0; col < tableData[row].length; col++) {
 
             if (tableData[row][col] !== "") {
+
+                // row and col are incremented because the table data doesn't include the headers
                 var coordinates = coordToPixel(row + 1, col + 1);
 
                 // Todo, use selections based on filtered CSV input
@@ -288,7 +308,8 @@ function searchSelectionTable() {
 
 // Creates a table for selecting an individual pokemon out of the list
 // Puts the table in outputDiv
-function createSelectionTable(data) {
+// selectionCallback is called when a selection is actually made by the user
+function createSelectionTable(data, selectionCallback) {
 
     // Clear the outputDiv
     selectionTable.innerHTML = "";
@@ -300,9 +321,11 @@ function createSelectionTable(data) {
         row.setAttribute("dex", data[i].dex_number);
         row.classList.add("tableData");
 
+        // https://medium.com/@leonardobrunolima/javascript-tips-common-mistake-using-closures-35d7b55f5380
+        let filePath = data[i].file_name;
         row.onclick = function() {
-            console.log("click");
-        }
+            selectionCallback(filePath);
+        };
 
         var nameTag = document.createElement("p");
         nameTag.innerHTML = data[i].identifier;
@@ -342,8 +365,13 @@ function showOverlay() {
 // Shows the selection overlay
 // The valid items to select are based on the row and column's category
 function showSelectionOverlay(row, col) {
-    var filteredData = getFilteredData(data, getFilterFromPos(row,col));
-    createSelectionTable(filteredData);
+    var filteredData = getFilteredData(csvData, getFilterFromPos(row,col));
+
+    createSelectionTable(filteredData, function(fileName) {
+        selectionData[row + 1][col + 1] = fileName;
+        hideOverlay();
+    });
+
     showOverlay();
 }
 
