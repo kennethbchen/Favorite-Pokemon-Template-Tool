@@ -22,9 +22,6 @@ const submitButton = document.getElementById("submitButton");
 // The main input table itself
 const inputTable = document.getElementById("mainTable");
 
-// The main image that is displayed
-const mainImage = document.getElementById("mainImage");
-
 // ------------------------------------
 
 // Div containing the menu overlay. Essentially the background of the overlay
@@ -33,6 +30,11 @@ const overlayDiv = document.getElementById("overlay");
 // Div containing the actual content of the menu overlay.
 const overlayContent = document.getElementById("overlayContent");
 
+// ------------------------------------
+
+// Div that contains all selection menu related elements
+const selectionOverlayDiv = document.getElementById("selectionOverlayContent");
+
 // The table that contains all selectable pokemon in the overlay menu
 const selectionTable = document.getElementById("selectionTable");
 
@@ -40,6 +42,15 @@ const selectionTable = document.getElementById("selectionTable");
 const selectionSearchBar = document.getElementById("selectionSearchBar");
 
 // ------------------------------------
+
+// Div that contains all output menu related elements
+const outputOverlayDiv = document.getElementById("outputOverlayContent");
+
+// The main image that is displayed
+const mainOutputImage = document.getElementById("mainOutputImage");
+
+// ------------------------------------
+
 
 // Column headers of the table
 const colHeaders = 
@@ -181,7 +192,8 @@ function renderImage() {
         }
     }
 
-    mergeImages(imageData).then(b64 => mainImage.setAttribute("src", b64));
+    mergeImages(imageData).then(b64 => mainOutputImage.setAttribute("src", b64));
+    showOutputOverlayContent();
 }
 
 // Gets an appropriate filter based on the position in the template.
@@ -309,16 +321,49 @@ function createSelectionTable(data, selectionCallback) {
 
 function hideOverlay() {
     overlayDiv.classList.add("disabled");
-
-    // Clear search bar contents
-    selectionSearchBar.value = "";
+    
 }
 
 function showOverlay() {
     overlayDiv.classList.remove("disabled");
+       
+}
+
+// TODO: implement showing specific overlay content way better
+function showSelectionOverlayContent() {
+
+    // Show the overlay content
+    selectionOverlayDiv.classList.remove("disabled");
+
+    // Hide the other overlay content
+    outputOverlayDiv.classList.add("disabled");
+    
+    // Scroll is needed
+    overlayContent.classList.add("scroll");
+
+    // Show the whole menu overlay
+    showOverlay();
+
+    // Clear search bar contents
+    selectionSearchBar.value = "";
 
     // Set focus to search bar
     selectionSearchBar.focus();
+}
+
+function showOutputOverlayContent() {
+
+    // Show the overlay content
+    outputOverlayDiv.classList.remove("disabled");
+
+    // Hide the other overlay content
+    selectionOverlayDiv.classList.add("disabled");
+
+    // Scroll is not needed
+    overlayContent.classList.remove("scroll");
+
+    // Show the whole menu overlay
+    showOverlay();
 }
 
 // Shows the selection overlay
@@ -334,7 +379,7 @@ function showSelectionOverlay(row, col) {
         hideOverlay();
     });
 
-    showOverlay();
+    showSelectionOverlayContent();
 }
 
 // Set Events
