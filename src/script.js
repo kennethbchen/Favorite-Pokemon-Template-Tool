@@ -19,26 +19,28 @@ const imagesLocation = "/ignore/all/";
 var data;
 
 // Div containing the main input table
-const tableDiv = $("#tableDiv");
+const tableDiv = document.getElementById("tableDiv");
 
 // Div containing the menu overlay. Essentially the background of the overlay
-const overlayDiv = $("#overlay");
+const overlayDiv = document.getElementById("overlay");
 
 // Div containing the actual content of the menu overlay.
-const overlayContent = $("#overlayContent");
+const overlayContent = document.getElementById("overlayContent");
 
 // Div that contains the selectable data for the overlay menu
-const selectionDiv = $("#selectionDiv");
+const selectionDiv = document.getElementById("selectionDiv");
 
-const selectionTable = $("#selectionTable");
+// The table that displays all selectable pokemon in the overlay menu
+const selectionTable = document.getElementById("selectionTable");
 
 // The input field that is used to search in the overlay menu
-const overlaySearchBar = $("#overlaySearchBar");
+const overlaySearchBar = document.getElementById("overlaySearchBar");
 
 // The main input table itself
-const inputTable = $("#mainTable");
+const inputTable = document.getElementById("mainTable");
 
-const mainImage = $("#mainImage");
+// The main image that is displayed
+const mainImage = document.getElementById("mainImage");
 
 // Column headers of the table
 const colHeaders = 
@@ -52,43 +54,53 @@ const rowHeaders =
 
 // ------------------------------------
 
-
-// Load the CSV Data and parse it
-$.ajax({
-    url: dataLocation,
-    dataType: "text",
-}).done(function(d) {
-    data = d3.csvParse(d);
-});
-
+// Get and parse CSV data
+var request = new XMLHttpRequest();
+request.onreadystatechange = function() {
+    if(request.readyState == XMLHttpRequest.DONE) {
+        data = d3.csvParse(request.responseText);
+    }
+}
+request.open("get", dataLocation, true);
+request.send();
 
 // Create rest of table
 for(var row = 0; row < gridHeight; row++) {
-    var tableRow = $("<tr>");
+    var tableRow = document.createElement("tr");
 
     for(var col = 0; col < gridWidth; col++) {
         
         if (row + col == 0) {
             // Handle Top left cell
-            tableRow.append($("<th>"));
+            tableRow.appendChild(document.createElement("th"));
         } else if (row == 0) {
             // Create Vertical Headings
-            tableRow.append($("<th>").text(colHeaders[col]));
+            var child = document.createElement("th");
+            child.innerHTML = colHeaders[col];
+            tableRow.appendChild(child);
         } else if (col == 0) {
             // Create Horizontal Headings
-            tableRow.append($("<th>").text(rowHeaders[row]));
+            var child = document.createElement("th");
+            child.innerHTML = rowHeaders[row];
+            tableRow.append(child);
         } else {
             // Create Inner Cells
             // Each inner cell input tag has an id "row col"
-            var data = $("<td>");
-            var input = $("<input>").attr("type", "button").attr("class", "tableButton").attr("onClick", "filterData(" + row + ", " + col + ")");
-            data.append(input);
-            tableRow.append(data);
+            var data = document.createElement("td");
+
+            var input = document.createElement("input");
+            input.setAttribute("type", "button");
+            input.setAttribute("onClick", "filterData(" + row + ", " + col + ")");
+            input.classList.add("tableButton");
+            
+            data.appendChild(input);
+
+            tableRow.appendChild(data);
         }
 
     }   
     
-    $("#mainTable").append(tableRow);
+    inputTable.appendChild(tableRow);
 }
 
 
@@ -238,32 +250,25 @@ function getFilteredData(data, filter) {
     return output;
 }
 
-// Set up overlay click events
-// Only close the overlay if the background (and not the content of the menu) is clicked
-// Mousedown probably doesn't work on mobile
-overlayDiv.mousedown( function(event) {
-    if (event.target.id == "overlay") {
-        hideOverlay();
-    }
-})
-
 
 // Searches the current filtered list of pokemon by hiding the elemnts that do not match the search query
 function searchSelectionTable() {
 
     // Get all table row elements that are the list of pokemon in the overlay
-    var tableData = $("tr.tableData");
+    var tableData = document.getElementsByClassName("tableData");
 
     for(var i = 0; i < tableData.length; i++) {
 
-        if($(tableData[i]).attr("name").search(overlaySearchBar.val()) != -1) {
-
+        if(tableData[i].getAttribute("name").search(overlaySearchBar.value) != -1) {
+            
             // The name matches, show it
-            $(tableData[i]).removeClass("disabled");
+            tableData[i].classList.remove("disabled");
+
         } else {
 
             // The name does not match, hide it
-            $(tableData[i]).addClass("disabled");
+            tableData[i].classList.add("disabled");
+
         }
     }
 
@@ -271,40 +276,64 @@ function searchSelectionTable() {
 
 // Creates a table for selecting an individual pokemon out of the list
 // Puts the table in outputDiv
-//
 function createSelectionTable(outputDiv, data) {
 
     // Clear the outputDiv
-    outputDiv.empty();
+    outputDiv.innerHTML = "";
 
     // Clear search bar input
     overlaySearchBar.value = "";
 
-    var outputTable = $("<table>");
+    var outputTable = document.createElement("table");
 
     for (var i = 0; i < data.length; i++) {
-        var row = $("<tr>").attr("name", data[i].identifier).attr("dex", data[i].dex_number).attr("class", "tableData");
 
-        var tableData = $("<td>").append($("<p>").html(data[i].identifier)).append($("<img>").attr("src", imagesLocation + data[i].file_name));
+        var row = document.createElement("tr");
+        row.setAttribute("name", data[i].identifier);
+        row.setAttribute("dex", data[i].dex_number);
+        row.classList.add("tableData");
 
-        row.append(tableData);
+        var tableData = document.createElement("td");
+        
+        var nameTag = document.createElement("p");
+        nameTag.innerHTML = data[i].identifier;
 
-        outputTable.append(row);
+        var imageTag = document.createElement("img");
+        imageTag.setAttribute("src", imagesLocation + data[i].file_name);
+
+        tableData.appendChild(nameTag);
+        tableData.appendChild(imageTag);
+
+        row.appendChild(tableData);
+
+        outputTable.appendChild(row);
     }
 
-    outputDiv.append(outputTable);
+    outputDiv.appendChild(outputTable);
 }
 
 
 
 function hideOverlay() {
-    overlayDiv.attr("class", "overlay disabled");
-    overlaySearchBar.val("");
+    overlayDiv.classList.add("disabled");
+
+    // Clear search bar contents
+    overlaySearchBar.value = "";
 }
 
 function showOverlay() {
-    overlayDiv.attr("class", "overlay");
+    overlayDiv.classList.remove("disabled");
+
+    // Set focus to search bar
     overlaySearchBar.focus();
+}
+
+// Set up overlay click events
+// Only close the overlay if the background (and not the content of the menu) is clicked
+overlayDiv.onmousedown = function(event) {
+    if (event.target.id == "overlay") {
+        hideOverlay();
+    }
 }
 
 function filterData(row, col) {
