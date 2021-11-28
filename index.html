@@ -11,23 +11,25 @@
 <div class="content">
     <div id="overlay" class="overlay disabled">
         <div id="overlayContent" class ="overlayContent scroll">
-            <h1>Menu</h1>
-            <input type="text" id="overlaySearchBar" onkeyup="searchSelectionTable();">
-            <div id="selectionDiv"></div>
+            <div id="selectionOverlayContent">
+                <h1>Menu</h1>
+                <input type="text" id="selectionSearchBar">
+                <table id="selectionTable"></table>
+            </div>
+            <div id="outputOverlayContent"></div>
         </div>
     </div>
     
-    <div id="tableDiv">
-        <table id="mainTable"></table>
-    </div>
+    <table id="mainTable"></table>
+
     
-    <button type="button" onclick="renderImage()">Generate</button>
+    <button type="button" id="submitButton">Generate</button>
     
     <img src = "/resources/template modified.png" id="mainImage">    
     
 </div>
 
-<script src="https://d3js.org/d3.v7.min.js"></script>
+<script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
 <script type="text/javascript" src="/node_modules/merge-images/dist/index.umd.js"></script>
 <script type="text/javascript" src="/src/script.js"></script>
 

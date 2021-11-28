@@ -14,12 +14,18 @@ const dataLocation = "/ignore/pokemon_data_simple.csv";
 // In ignore folder for testing
 const imagesLocation = "/ignore/all/";
 
-// Array containing CSV data from dataLocation
-// Array of javascript objects
-var data;
+// ------------------------------------
 
-// Div containing the main input table
-const tableDiv = document.getElementById("tableDiv");
+// Submit Button
+const submitButton = document.getElementById("submitButton");
+
+// The main input table itself
+const inputTable = document.getElementById("mainTable");
+
+// The main image that is displayed
+const mainImage = document.getElementById("mainImage");
+
+// ------------------------------------
 
 // Div containing the menu overlay. Essentially the background of the overlay
 const overlayDiv = document.getElementById("overlay");
@@ -27,20 +33,13 @@ const overlayDiv = document.getElementById("overlay");
 // Div containing the actual content of the menu overlay.
 const overlayContent = document.getElementById("overlayContent");
 
-// Div that contains the selectable data for the overlay menu
-const selectionDiv = document.getElementById("selectionDiv");
-
-// The table that displays all selectable pokemon in the overlay menu
+// The table that contains all selectable pokemon in the overlay menu
 const selectionTable = document.getElementById("selectionTable");
 
 // The input field that is used to search in the overlay menu
-const overlaySearchBar = document.getElementById("overlaySearchBar");
+const selectionSearchBar = document.getElementById("selectionSearchBar");
 
-// The main input table itself
-const inputTable = document.getElementById("mainTable");
-
-// The main image that is displayed
-const mainImage = document.getElementById("mainImage");
+// ------------------------------------
 
 // Column headers of the table
 const colHeaders = 
@@ -50,7 +49,11 @@ const colHeaders =
 
  // Row Headers of the table
 const rowHeaders =
-["", "I (1)", "II (2)", "III (3)", "IV (4)", "V (5)", "VI (6)", "VII (7)", "VII (8)", "Favorite"]
+["", "I (1)", "II (2)", "III (3)", "IV (4)", "V (5)", "VI (6)", "VII (7)", "VII (8)", "Favorite"];
+
+// Array containing CSV data from dataLocation
+// Array of javascript objects
+var data;
 
 // ------------------------------------
 
@@ -71,28 +74,36 @@ for(var row = 0; row < gridHeight; row++) {
     for(var col = 0; col < gridWidth; col++) {
         
         if (row + col == 0) {
+
             // Handle Top left cell
             tableRow.appendChild(document.createElement("th"));
+
         } else if (row == 0) {
+
             // Create Vertical Headings
             var child = document.createElement("th");
             child.innerHTML = colHeaders[col];
             tableRow.appendChild(child);
+
         } else if (col == 0) {
+
             // Create Horizontal Headings
             var child = document.createElement("th");
             child.innerHTML = rowHeaders[row];
             tableRow.append(child);
+
         } else {
             // Create Inner Cells
             // Each inner cell input tag has an id "row col"
-            var data = document.createElement("td");
+            
 
             var input = document.createElement("input");
             input.setAttribute("type", "button");
-            input.setAttribute("onClick", "filterData(" + row + ", " + col + ")");
+            input.setAttribute("onClick", "showSelectionOverlay(" + row + ", " + col + ")");
             input.classList.add("tableButton");
             
+            var data = document.createElement("td");
+
             data.appendChild(input);
 
             tableRow.appendChild(data);
@@ -225,7 +236,6 @@ function getFilterFromPos(row, col) {
 }
 
 
-
 // Filter the CSV data by type or generation
 function getFilteredData(data, filter) {
     var output;
@@ -257,9 +267,11 @@ function searchSelectionTable() {
     // Get all table row elements that are the list of pokemon in the overlay
     var tableData = document.getElementsByClassName("tableData");
 
+    // Go through all table elements
     for(var i = 0; i < tableData.length; i++) {
 
-        if(tableData[i].getAttribute("name").search(overlaySearchBar.value) != -1) {
+        // Compare the name attribute with the search query
+        if(tableData[i].getAttribute("name").search(selectionSearchBar.value) != -1) {
             
             // The name matches, show it
             tableData[i].classList.remove("disabled");
@@ -276,15 +288,10 @@ function searchSelectionTable() {
 
 // Creates a table for selecting an individual pokemon out of the list
 // Puts the table in outputDiv
-function createSelectionTable(outputDiv, data) {
+function createSelectionTable(data) {
 
     // Clear the outputDiv
-    outputDiv.innerHTML = "";
-
-    // Clear search bar input
-    overlaySearchBar.value = "";
-
-    var outputTable = document.createElement("table");
+    selectionTable.innerHTML = "";
 
     for (var i = 0; i < data.length; i++) {
 
@@ -293,23 +300,27 @@ function createSelectionTable(outputDiv, data) {
         row.setAttribute("dex", data[i].dex_number);
         row.classList.add("tableData");
 
-        var tableData = document.createElement("td");
-        
+        row.onclick = function() {
+            console.log("click");
+        }
+
         var nameTag = document.createElement("p");
         nameTag.innerHTML = data[i].identifier;
 
         var imageTag = document.createElement("img");
         imageTag.setAttribute("src", imagesLocation + data[i].file_name);
 
+        var tableData = document.createElement("td");
+
         tableData.appendChild(nameTag);
         tableData.appendChild(imageTag);
 
         row.appendChild(tableData);
 
-        outputTable.appendChild(row);
+        selectionTable.appendChild(row);
     }
 
-    outputDiv.appendChild(outputTable);
+
 }
 
 
@@ -318,17 +329,31 @@ function hideOverlay() {
     overlayDiv.classList.add("disabled");
 
     // Clear search bar contents
-    overlaySearchBar.value = "";
+    selectionSearchBar.value = "";
 }
 
 function showOverlay() {
     overlayDiv.classList.remove("disabled");
 
     // Set focus to search bar
-    overlaySearchBar.focus();
+    selectionSearchBar.focus();
 }
 
-// Set up overlay click events
+// Shows the selection overlay
+// The valid items to select are based on the row and column's category
+function showSelectionOverlay(row, col) {
+    var filteredData = getFilteredData(data, getFilterFromPos(row,col));
+    createSelectionTable(filteredData);
+    showOverlay();
+}
+
+// Set Events
+
+submitButton.onclick = function() {
+    renderImage();
+}
+
+// Set up overlay click event
 // Only close the overlay if the background (and not the content of the menu) is clicked
 overlayDiv.onmousedown = function(event) {
     if (event.target.id == "overlay") {
@@ -336,10 +361,6 @@ overlayDiv.onmousedown = function(event) {
     }
 }
 
-function filterData(row, col) {
-    var filteredData = getFilteredData(data, getFilterFromPos(row,col));
-    createSelectionTable(selectionDiv, filteredData);
-    showOverlay();
+selectionSearchBar.onkeyup = function () {
+    searchSelectionTable();
 }
-
-
