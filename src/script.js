@@ -35,11 +35,14 @@ const overlayContent = document.getElementById("overlayContent");
 // Div that contains all selection menu related elements
 const selectionOverlayDiv = document.getElementById("selectionOverlayContent");
 
-// The table that contains all selectable pokemon in the overlay menu
-const selectionTable = document.getElementById("selectionTable");
+const selectionHeader = document.getElementById("selectionHeader");
 
 // The input field that is used to search in the overlay menu
 const selectionSearchBar = document.getElementById("selectionSearchBar");
+
+// Div that contains all selection items
+const selectionDiv = document.getElementById("selectionDiv");
+
 
 // ------------------------------------
 
@@ -60,7 +63,7 @@ const colHeaders =
 
  // Row Headers of the table
 const rowHeaders =
-["", "I (1)", "II (2)", "III (3)", "IV (4)", "V (5)", "VI (6)", "VII (7)", "VII (8)", "Favorite"];
+["", "1", "2", "3", "4", "5", "6", "7", "8", "Favorite"];
 
 // Array containing CSV data from dataLocation
 // Array of javascript objects
@@ -91,17 +94,17 @@ request.send();
 
 
 // Create rest of table
-for(var row = 0; row < gridHeight; row++) {
+for(var element = 0; element < gridHeight; element++) {
     var tableRow = document.createElement("tr");
 
     for(var col = 0; col < gridWidth; col++) {
         
-        if (row + col == 0) {
+        if (element + col == 0) {
 
             // Handle Top left cell
             tableRow.appendChild(document.createElement("th"));
 
-        } else if (row == 0) {
+        } else if (element == 0) {
 
             // Create Vertical Headings
             var child = document.createElement("th");
@@ -112,7 +115,7 @@ for(var row = 0; row < gridHeight; row++) {
 
             // Create Horizontal Headings
             var child = document.createElement("th");
-            child.innerHTML = rowHeaders[row];
+            child.innerHTML = rowHeaders[element];
             tableRow.append(child);
 
         } else {
@@ -122,7 +125,7 @@ for(var row = 0; row < gridHeight; row++) {
 
             var input = document.createElement("input");
             input.setAttribute("type", "button");
-            input.setAttribute("onClick", "showSelectionOverlay(" + row + ", " + col + ")");
+            input.setAttribute("onClick", "showSelectionOverlay(" + element + ", " + col + ")");
             input.classList.add("tableButton");
             
             var csvData = document.createElement("td");
@@ -139,10 +142,10 @@ for(var row = 0; row < gridHeight; row++) {
 
 // Initalize selectionData based on the dimensions of the input table
 // Row and Col start as 1 because we want to skip the headers
-for (var row = 1; row < inputTable.rows.length; row++) {
+for (var element = 1; element < inputTable.rows.length; element++) {
     var newRow = [];
 
-    for (var col = 1; col < inputTable.rows[row].cells.length; col++) {
+    for (var col = 1; col < inputTable.rows[element].cells.length; col++) {
         
         newRow.push("");
        
@@ -263,48 +266,47 @@ function getFilteredData(data, filter) {
 }
 
 // Searches the current filtered list of pokemon by hiding the elemnts that do not match the search query
-function searchSelectionTable() {
+function searchSelection() {
 
-    // Get all table row elements that are the list of pokemon in the overlay
-    var tableData = document.getElementsByClassName("tableData");
+    // Get all elements that are the selection items
+    var selectionItem = document.getElementsByClassName("selectionItem");
 
     // Go through all table elements
-    for(var i = 0; i < tableData.length; i++) {
+    for(var i = 0; i < selectionItem.length; i++) {
 
         // Compare the name attribute with the search query
-        if(tableData[i].getAttribute("name").search(selectionSearchBar.value) != -1) {
+        if(selectionItem[i].getAttribute("name").search(selectionSearchBar.value) != -1) {
             
             // The name matches, show it
-            tableData[i].classList.remove("disabled");
+            selectionItem[i].classList.remove("disabled");
 
         } else {
 
             // The name does not match, hide it
-            tableData[i].classList.add("disabled");
+            selectionItem[i].classList.add("disabled");
 
         }
     }
 
 }
 
-// Creates a table for selecting an individual pokemon out of the list
-// Puts the table in outputDiv
+// Creates a grid for selecting an individual pokemon out of the list
 // selectionCallback is called when a selection is actually made by the user
-function createSelectionTable(data, selectionCallback) {
+function createSelectionGrid(data, selectionCallback) {
 
     // Clear the outputDiv
-    selectionTable.innerHTML = "";
+    selectionDiv.innerHTML = "";
 
     for (var i = 0; i < data.length; i++) {
 
-        var row = document.createElement("tr");
-        row.setAttribute("name", data[i].identifier);
-        row.setAttribute("dex", data[i].dex_number);
-        row.classList.add("tableData");
+        var item = document.createElement("div");
+        item.setAttribute("name", data[i].identifier);
+        item.setAttribute("dex", data[i].dex_number);
+        item.classList.add("selectionItem");
 
         // https://medium.com/@leonardobrunolima/javascript-tips-common-mistake-using-closures-35d7b55f5380
         let filePath = data[i].file_name;
-        row.onclick = function() {
+        item.onclick = function() {
             selectionCallback(filePath);
         };
 
@@ -314,14 +316,10 @@ function createSelectionTable(data, selectionCallback) {
         var imageTag = document.createElement("img");
         imageTag.setAttribute("src", imagesLocation + data[i].file_name);
 
-        var tableData = document.createElement("td");
+        item.appendChild(nameTag);
+        item.appendChild(imageTag);
 
-        tableData.appendChild(nameTag);
-        tableData.appendChild(imageTag);
-
-        row.appendChild(tableData);
-
-        selectionTable.appendChild(row);
+        selectionDiv.appendChild(item);
     }
 
 
@@ -379,7 +377,25 @@ function showOutputOverlayContent() {
 function showSelectionOverlay(row, col) {
     var filteredData = getFilteredData(csvData, getFilterFromPos(row,col));
 
-    createSelectionTable(filteredData, function(fileName) {
+    // Set the header to indicate the filter
+    var header = "";
+
+    // The favorite row does not need "Gen "
+    header += (row == gridHeight-1 ? "" : "Gen ");
+
+    // Add Gen and Type
+    header += rowHeaders[row] + " " + colHeaders[col];
+
+    // Only the 18 types need "Type" in the header
+    header += (col <= 18 ? " Type" : "");
+
+    // Special case for bottom right corner
+    header = (row == gridHeight-1 && col == gridWidth-1 ? "All Time Favorite" : header);
+    
+    
+    selectionHeader.innerHTML = header;
+
+    createSelectionGrid(filteredData, function(fileName) {
 
         // row and col are decremented by because they include the header
         // selecitonData does not include headers so one row and one col is ignored
@@ -405,7 +421,7 @@ overlayDiv.onmousedown = function(event) {
 }
 
 selectionSearchBar.onkeyup = function () {
-    searchSelectionTable();
+    searchSelection();
 }
 
 function printSelectionData(){

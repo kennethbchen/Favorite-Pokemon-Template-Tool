@@ -1,3 +1,20 @@
+:root {
+    /*
+    --main: #24436a;
+    --main1d: #1A314C;
+    --main1l: #346198;
+    */
+
+    --main: #ffffff;
+    --main1d: #ffffff;
+    --main1l: #ffffff;
+}
+
+body {
+    background-color : var(--main);
+}
+
+
 h1 {
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
@@ -36,6 +53,15 @@ img {
     max-height: 100vh;
 }
 
+.scroll {
+    overflow-y: scroll;
+}
+
+.disabled {
+    display:none;
+    
+}
+
 .overlay {
     position:fixed;
     top:  0;
@@ -48,8 +74,68 @@ img {
     
 }
 
+#selectionSearchBar {
+    display: block;
+    margin: 2% auto 2% auto;
+    width: 50%;
+    font-size: 16px;
+}
+
+#selectionDiv {
+    
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+    grid-auto-rows: minmax(100px, auto);
+    padding-top: 2%;
+    padding-bottom: 2%;
+
+    margin: 5px;
+    border-style:solid;
+    border-width: 2px;
+    border-color:rgb(212, 212, 212);
+}
+
+#selectionDiv img {
+    display:block;
+    margin:auto;
+}
+
+#selectionDiv p {
+    text-align:center;
+    margin: 1px auto auto auto;
+    padding: auto auto auto auto;
+}
+
+#selectionDiv img, #selectionDiv p {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select:   none; /* Safari */
+     -khtml-user-select:   none; /* Konqueror HTML */
+       -moz-user-select:   none; /* Old versions of Firefox */
+        -ms-user-select:   none; /* Internet Explorer/Edge */
+            user-select:   none;
+}
+
+.selectionItem {
+    border-style:solid;
+    border-width: 1px;
+    border-color: rgb(173, 173, 173);
+    margin: auto;
+    
+}
+
+.selectionItem:hover {
+    background-color:rgb(211, 211, 211);
+    border-color: rgb(150, 150, 173);
+}
+
+.selectionItem:active {
+    background-color:rgb(182, 182, 182);
+    border-color: rgb(121, 121, 121);
+}
+
 .overlayContent {
-    background-color: white;
+    background-color: var(--main1l);
     margin:auto;
     margin-top: 10%;
     width: 50%;
@@ -58,12 +144,6 @@ img {
     
 }
 
-.scroll {
-    overflow-y: scroll;
-}
 
-.disabled {
-    display:none;
-    
-}
+
 
