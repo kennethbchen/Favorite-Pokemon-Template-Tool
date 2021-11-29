@@ -77,10 +77,18 @@ var request = new XMLHttpRequest();
 request.onreadystatechange = function() {
     if(request.readyState == XMLHttpRequest.DONE) {
         csvData = d3.csvParse(request.responseText);
+        
+        // Once the csv data is loaded, all of the image file paths are known
+        // Preload all images
+        for(var i = 0; i < csvData.length; i++) {
+            var newImg = new Image();
+            newImg.src = imagesLocation + csvData[i].file_name;
+        }
     }
 }
 request.open("get", dataLocation, true);
 request.send();
+
 
 // Create rest of table
 for(var row = 0; row < gridHeight; row++) {
