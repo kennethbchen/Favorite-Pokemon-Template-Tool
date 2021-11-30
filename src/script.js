@@ -22,6 +22,8 @@ const submitButton = document.getElementById("submitButton");
 // The main input table itself
 const inputTable = document.getElementById("mainTable");
 
+const mainGrid = document.getElementById("mainGrid");
+
 // ------------------------------------
 
 // Div containing the menu overlay. Essentially the background of the overlay
@@ -93,59 +95,62 @@ request.open("get", dataLocation, true);
 request.send();
 
 
-// Create rest of table
-for(var element = 0; element < gridHeight; element++) {
-    var tableRow = document.createElement("tr");
+// Create rest of grid
+for(var row = 0; row < gridHeight; row++) {
 
     for(var col = 0; col < gridWidth; col++) {
-        
-        if (element + col == 0) {
-
-            // Handle Top left cell
-            tableRow.appendChild(document.createElement("th"));
-
-        } else if (element == 0) {
+        var newItem = document.createElement("div");
+        if (row + col == 0) {     
+            // Don't do anything
+        } else if (row == 0) {
 
             // Create Vertical Headings
-            var child = document.createElement("th");
+            var child = document.createElement("h4");
+            child.classList.add("gridHeader");
             child.innerHTML = colHeaders[col];
-            tableRow.appendChild(child);
+            newItem.appendChild(child);
 
         } else if (col == 0) {
 
             // Create Horizontal Headings
-            var child = document.createElement("th");
-            child.innerHTML = rowHeaders[element];
-            tableRow.append(child);
+            var child = document.createElement("h4");
+            child.classList.add("gridHeader");
+            child.innerHTML = rowHeaders[row];
+            newItem.append(child);
 
         } else {
             // Create Inner Cells
-            // Each inner cell input tag has an id "row col"
+            // Each inner cell has a button that opens the selection overlay            
             
+            let input = document.createElement("button");
 
-            var input = document.createElement("input");
-            input.setAttribute("type", "button");
-            input.setAttribute("onClick", "showSelectionOverlay(" + element + ", " + col + ")");
+            let tempRow = row;
+            let tempCol = col;
+
+            // If the button is clicked, then open the selection overlay
+            input.onclick = function() {
+                // Pass the button itself in the function so that if a selection is made,
+                // the image of the button can be changed to whatever the selection is
+                showSelectionOverlay(input, tempRow, tempCol);
+            }
+
             input.classList.add("tableButton");
-            
-            var csvData = document.createElement("td");
 
-            csvData.appendChild(input);
-
-            tableRow.appendChild(csvData);
+            newItem.appendChild(input);
         }
 
+        mainGrid.appendChild(newItem);
     }   
     
-    inputTable.appendChild(tableRow);
+    
 }
 
 // Initalize selectionData based on the dimensions of the input table
 // Row and Col start as 1 because we want to skip the headers
-for (var element = 1; element < inputTable.rows.length; element++) {
+for (var row = 1; row < gridHeight; row++) {
     var newRow = [];
 
-    for (var col = 1; col < inputTable.rows[element].cells.length; col++) {
+    for (var col = 1; col < gridWidth; col++) {
         
         newRow.push("");
        
@@ -292,6 +297,7 @@ function searchSelection() {
 
 // Creates a grid for selecting an individual pokemon out of the list
 // selectionCallback is called when a selection is actually made by the user
+// The callback passes the image name of the selection made which can be used to record the selection
 function createSelectionGrid(data, selectionCallback) {
 
     // Clear the outputDiv
@@ -304,17 +310,20 @@ function createSelectionGrid(data, selectionCallback) {
         item.setAttribute("dex", data[i].dex_number);
         item.classList.add("selectionItem");
 
+        var nameTag = document.createElement("p");
+        nameTag.innerHTML = data[i].identifier;
+
+        let imageTag = document.createElement("img");
+        imageTag.setAttribute("src", imagesLocation + data[i].file_name);
+
+        // Set the onclick action for the button
         // https://medium.com/@leonardobrunolima/javascript-tips-common-mistake-using-closures-35d7b55f5380
         let filePath = data[i].file_name;
         item.onclick = function() {
             selectionCallback(filePath);
         };
 
-        var nameTag = document.createElement("p");
-        nameTag.innerHTML = data[i].identifier;
-
-        var imageTag = document.createElement("img");
-        imageTag.setAttribute("src", imagesLocation + data[i].file_name);
+        
 
         item.appendChild(nameTag);
         item.appendChild(imageTag);
@@ -374,7 +383,7 @@ function showOutputOverlayContent() {
 
 // Shows the selection overlay
 // The valid items to select are based on the row and column's category
-function showSelectionOverlay(row, col) {
+function showSelectionOverlay(input, row, col) {
     var filteredData = getFilteredData(csvData, getFilterFromPos(row,col));
 
     // Set the header to indicate the filter
@@ -395,19 +404,29 @@ function showSelectionOverlay(row, col) {
     
     selectionHeader.innerHTML = header;
 
+    // A selection in the selection grid will call the callback function when it is selected
+    // The callback performs all operations necessary to store user input
     createSelectionGrid(filteredData, function(fileName) {
 
         // row and col are decremented by because they include the header
         // selecitonData does not include headers so one row and one col is ignored
         selectionData[row - 1][col - 1] = fileName;
         hideOverlay();
+
+        // Set the image of the button that called the selection overlay to be
+        // The image that the user selected
+        input.innerHTML = "";
+        var img = document.createElement("img");
+        img.setAttribute("src", imagesLocation + fileName);
+        input.append(img);
+        //input.setAttribute("src", imagesLocation + fileName);
+        
     });
 
     showSelectionOverlayContent();
 }
 
 // Set Events
-
 submitButton.onclick = function() {
     renderImage();
 }
