@@ -19,9 +19,7 @@ const imagesLocation = "/ignore/all/";
 // Submit Button
 const submitButton = document.getElementById("submitButton");
 
-// The main input table itself
-const inputTable = document.getElementById("mainTable");
-
+// The main grid
 const mainGrid = document.getElementById("mainGrid");
 
 // ------------------------------------
@@ -419,7 +417,6 @@ function showSelectionOverlay(input, row, col) {
         var img = document.createElement("img");
         img.setAttribute("src", imagesLocation + fileName);
         input.append(img);
-        //input.setAttribute("src", imagesLocation + fileName);
         
     });
 
