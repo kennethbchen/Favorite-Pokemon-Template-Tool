@@ -9,10 +9,10 @@ const gridWidth = 23;
 const gridHeight = 10;
 
 const templateLocation = "/resources/template modified.png";
-const dataLocation = "/ignore/All Data.csv";
+const dataLocation = "/resources/All Data.csv";
 
 // In ignore folder for testing
-const imagesLocation = "/ignore/all/";
+const imagesLocation = "/resources/images/";
 
 // ------------------------------------
 

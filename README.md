@@ -23,5 +23,5 @@ Currently, the bottom half of the template (black background) is not supported. 
 ## Notes
 
 - The page won't display well on smaller screens. Try to maximize the browser window.
-- Many, many images will be loaded, so some probably won't display immediately.
-- All Time Favorite (bottom right cell) will probably lag while it is loading.
+- Many, many images will be loaded (like 1,300+), so some probably won't display immediately.
+- All Time Favorite (bottom right cell) will probably lag while it is loading all the images.
