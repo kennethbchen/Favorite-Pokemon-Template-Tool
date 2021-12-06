@@ -217,14 +217,12 @@ function getFilterFromPos(row, col) {
 
     // Filter column by type / other
     switch(col) {
-        case 19: // Starter column filter not implemented
-            break;
-            /*
+        case 19:
             output.starter = true;
             output.legend = false;
             output.mega = false;
             output.gigantimax = false;
-            */
+            break;
         case 20: // Mega column
             output.mega = true;
             output.gigantimax = false;
@@ -234,7 +232,10 @@ function getFilterFromPos(row, col) {
             output.mega = false;
             output.gigantimax = false;
             break;
-        case gridWidth - 1: // Favorite col, no filter
+        case gridWidth - 1: // Favorite col, no mega or gigantimax
+            output.mega = false;
+            output.gigantimax = false;
+            break;
         case 0: // Header col, invalid
             break;
         default: // Normal numbered column
