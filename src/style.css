@@ -35,6 +35,11 @@ img {
 
 }
 
+.header {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
 #overlay {
     position:fixed;
     top:  0;

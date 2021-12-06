@@ -21,6 +21,7 @@ This is a (kind of janky) tool used to fill out this favorite Pokemon template:
 - Duplicate Pokemon are either different forms, regional variants, or gender differences
 - Some cells don't have any valid options (Gen 1 Dark types, Gen 7/8 Megas)
 - Some cells only have one valid option
+- Refresh the page to reset progress (progress does not save)
 
 Currently, the bottom half of the template (black background) is not supported. You'll have to do that yourself with some image editing program.
 
