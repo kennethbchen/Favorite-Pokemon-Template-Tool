@@ -9,7 +9,7 @@ const gridWidth = 23;
 const gridHeight = 10;
 
 const templateLocation = "/resources/template modified.png";
-const dataLocation = "/ignore/pokemon_data_simple.csv";
+const dataLocation = "/ignore/All Data.csv";
 
 // In ignore folder for testing
 const imagesLocation = "/ignore/all/";
@@ -212,20 +212,38 @@ function renderImage() {
 
 // Gets an appropriate filter based on the position in the template.
 // For example, on the "Normal" column, gets a filter that selects for normal types
-// Starter, Mega, and Legend filtering not implemented
 function getFilterFromPos(row, col) {
     var output = {};
 
     // Filter column by type / other
     switch(col) {
-        case 21: // Legend column, filter not implemented
-        case 20: // Mega column, filter not implemented
         case 19: // Starter column filter not implemented
-        case gridWidth - 1: // Favorite row, no filter
-        case 0: // Header Row, invalid
             break;
-        default:
+            /*
+            output.starter = true;
+            output.legend = false;
+            output.mega = false;
+            output.gigantimax = false;
+            */
+        case 20: // Mega column
+            output.mega = true;
+            output.gigantimax = false;
+            break;
+        case 21: // Legend column
+            output.legend = true;
+            output.mega = false;
+            output.gigantimax = false;
+            break;
+        case gridWidth - 1: // Favorite col, no filter
+        case 0: // Header col, invalid
+            break;
+        default: // Normal numbered column
             output.type = colHeaders[col].toLowerCase(); 
+
+            // By default, megas and gigantimax are not allowed
+            output.mega = false;
+            output.gigantimax = false;
+
             break;
     }
 
@@ -255,13 +273,25 @@ function getFilteredData(data, filter) {
 
     output = data.filter(function(row) {
         
-        // If there is a type filter, then use it, else all types are allowed
-        var typeMatch = (filter.type == null ? true : row.type_1 == filter.type || row.type_2 == filter.type);
+        // If there is not a type filter, then all types are allowed, else, use the filter
+        var typeMatch =    (filter.type == null ? true : row.type_1 == filter.type || row.type_2 == filter.type);
 
-        // If there is a gen filter, then use it, else all gens are allowed
-        var genMatch = (filter.gen == null ? true : row.gen == filter.gen);
+        // If there is not a generation filter, then all generations are allowed, else, use the filter
+        var genMatch =     (filter.gen == null ? true : row.gen == filter.gen);
 
-        return typeMatch && genMatch;
+        // If there is not a starter filter, allow, else, use the filter
+        var starterMatch = (filter.starter == null ? true : row.is_starter == filter.starter);
+
+        // If there is not a mega filter, allow, else, use the filter
+        var megaMatch =    (filter.mega == null ? true : row.is_mega == filter.mega);
+
+        // If there is not a legend filter, allow, else, use the filter
+        var legendMatch =  (filter.legend == null ? true : row.is_legendary == filter.legend);
+
+        // If there is not a gigantimax filter, allow, else, use the filter
+        var gigantimaxMatch = (filter.gigantimax == null ? true : row.is_gigantimax == filter.gigantimax);
+
+        return typeMatch && genMatch && starterMatch && megaMatch && legendMatch && gigantimaxMatch;
 
     });
 
