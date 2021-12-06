@@ -3,29 +3,31 @@
     <title>Favorite Pokemon Template Tool</title>
 
     <link rel="stylesheet" href="/src/style.css">
+    <link rel="stylesheet" href="/src/style-selectionOverlay.css">
 </head>
 
 <body>
 
     
 <div class="content">
-    <div id="overlay" class="overlay disabled">
-        <div id="overlayContent" class ="overlayContent scroll">
+    <div id="overlay" class="disabled">
+        <div id="overlayContent" class ="overlayContent">
             <div id="selectionOverlayContent">
                 <h1 id="selectionHeader"> Menu </h1>
-                <input type="text" id="selectionSearchBar" placeholder="Search">
-                <div id="selectionDiv"></div>
+                <input type="text" id="selectionSearchBar" placeholder="Search Name">
+                <div id="selectionGrid"></div>
             </div>
-            <div id="outputOverlayContent"><img src = "/resources/template modified.png" id="mainOutputImage"></div>
+            <div id="outputOverlayContent">
+                <img src = "/resources/template modified.png" id="mainOutputImage">
+            </div>
         </div>
     </div>
     
     <table id="mainTable"></table>
     <div id="mainGrid"></div>
 
-    
     <button type="button" id="submitButton">Generate</button>
-    <button type="button" onclick="printSelectionData()">Debug: Print SelectionData</button>
+   <!-- Debug: <button type="button" onclick="printSelectionData()">Debug: Print SelectionData</button>-->
       
     
 </div>

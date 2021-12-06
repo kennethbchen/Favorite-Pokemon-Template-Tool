@@ -41,7 +41,7 @@ const selectionHeader = document.getElementById("selectionHeader");
 const selectionSearchBar = document.getElementById("selectionSearchBar");
 
 // Div that contains all selection items
-const selectionDiv = document.getElementById("selectionDiv");
+const selectionGrid = document.getElementById("selectionGrid");
 
 
 // ------------------------------------
@@ -51,6 +51,7 @@ const outputOverlayDiv = document.getElementById("outputOverlayContent");
 
 // The main image that is displayed
 const mainOutputImage = document.getElementById("mainOutputImage");
+
 
 // ------------------------------------
 
@@ -302,6 +303,9 @@ function getFilteredData(data, filter) {
 // Searches the current filtered list of pokemon by hiding the elemnts that do not match the search query
 function searchSelection() {
 
+    // Reset scroll of selection
+    selectionGrid.scrollTop = 0;
+
     // Get all elements that are the selection items
     var selectionItem = document.getElementsByClassName("selectionItem");
 
@@ -309,7 +313,7 @@ function searchSelection() {
     for(var i = 0; i < selectionItem.length; i++) {
 
         // Compare the name attribute with the search query
-        if(selectionItem[i].getAttribute("name").search(selectionSearchBar.value) != -1) {
+        if(selectionItem[i].getAttribute("name").toLowerCase().search(selectionSearchBar.value.toLowerCase()) != -1) {
             
             // The name matches, show it
             selectionItem[i].classList.remove("disabled");
@@ -330,7 +334,7 @@ function searchSelection() {
 function createSelectionGrid(data, selectionCallback) {
 
     // Clear the outputDiv
-    selectionDiv.innerHTML = "";
+    selectionGrid.innerHTML = "";
 
     for (var i = 0; i < data.length; i++) {
 
@@ -357,7 +361,7 @@ function createSelectionGrid(data, selectionCallback) {
         item.appendChild(nameTag);
         item.appendChild(imageTag);
 
-        selectionDiv.appendChild(item);
+        selectionGrid.appendChild(item);
     }
 
 
@@ -382,9 +386,6 @@ function showSelectionOverlayContent() {
     // Hide the other overlay content
     outputOverlayDiv.classList.add("disabled");
     
-    // Scroll is needed
-    overlayContent.classList.add("scroll");
-
     // Show the whole menu overlay
     showOverlay();
 
@@ -393,6 +394,10 @@ function showSelectionOverlayContent() {
 
     // Set focus to search bar
     selectionSearchBar.focus();
+
+    // Reset scroll of selection
+    selectionGrid.scrollTop = 0;
+
 }
 
 function showOutputOverlayContent() {
@@ -402,9 +407,6 @@ function showOutputOverlayContent() {
 
     // Hide the other overlay content
     selectionOverlayDiv.classList.add("disabled");
-
-    // Scroll is not needed
-    overlayContent.classList.remove("scroll");
 
     // Show the whole menu overlay
     showOverlay();
@@ -430,8 +432,8 @@ function showSelectionOverlay(input, row, col) {
     // Special case for bottom right corner
     header = (row == gridHeight-1 && col == gridWidth-1 ? "All Time Favorite" : header);
     
-    
     selectionHeader.innerHTML = header;
+
 
     // A selection in the selection grid will call the callback function when it is selected
     // The callback performs all operations necessary to store user input
