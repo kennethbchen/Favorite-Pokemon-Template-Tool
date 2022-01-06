@@ -72,7 +72,7 @@ var csvData;
 
 // 2D array containing the user's selected images for each cell
 // Each image is the image name as a string
-var selectionData = [];
+var selectionData = {"main":[]};
 
 // ------------------------------------
 
@@ -155,7 +155,7 @@ for (var row = 1; row < gridHeight; row++) {
        
     }
 
-    selectionData.push(newRow);
+    selectionData.main.push(newRow);
 }
 
 // Starts top left at (0,0)
@@ -192,17 +192,17 @@ function renderImage() {
     imageData.push({src: templateLocation, x: 0, y:0});
 
     // Add images based on the table data
-    for(var row = 0; row < selectionData.length; row++) {
-        for (var col = 0; col < selectionData[row].length; col++) {
+    for(var row = 0; row < selectionData.main.length; row++) {
+        for (var col = 0; col < selectionData.main[row].length; col++) {
 
-            if (selectionData[row][col] !== "") {
+            if (selectionData.main[row][col] !== "") {
 
                 // row and col are incremented because the table data doesn't include the headers
                 // So to properly get the coordinates, the headers need to be taken into account
                 var coordinates = coordToPixel(row + 1, col + 1);
 
                 // Todo, use selections based on filtered CSV input
-                imageData.push({src: imagesLocation + selectionData[row][col], x: coordinates[0], y: coordinates[1]});
+                imageData.push({src: imagesLocation + selectionData.main[row][col], x: coordinates[0], y: coordinates[1]});
             }
         }
     }
@@ -441,7 +441,7 @@ function showSelectionOverlay(input, row, col) {
 
         // row and col are decremented by because they include the header
         // selecitonData does not include headers so one row and one col is ignored
-        selectionData[row - 1][col - 1] = fileName;
+        selectionData.main[row - 1][col - 1] = fileName;
         hideOverlay();
 
         // Set the image of the button that called the selection overlay to be
