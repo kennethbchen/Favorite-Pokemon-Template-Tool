@@ -8,10 +8,9 @@ const borderSize = 1;
 const gridWidth = 23;
 const gridHeight = 10;
 
+// Resource locations
 const templateLocation = "resources/template modified.png";
 const dataLocation = "resources/All Data.csv";
-
-// In ignore folder for testing
 const imagesLocation = "resources/images/";
 
 // ------------------------------------
@@ -52,7 +51,6 @@ const outputOverlayDiv = document.getElementById("outputOverlayContent");
 // The main image that is displayed
 const mainOutputImage = document.getElementById("mainOutputImage");
 
-
 // ------------------------------------
 
 
@@ -70,8 +68,12 @@ const rowHeaders =
 // Array of javascript objects
 var csvData;
 
-// 2D array containing the user's selected images for each cell
-// Each image is the image name as a string
+// Array containing all buttons in the main selection grid
+var mainButtons = [];
+
+// JSON Object containing all user selections
+// "main" is a 2D array containing the bulk of the selections
+// This object is directly exported
 var selectionData = {"main":[]};
 
 // ------------------------------------
@@ -134,6 +136,9 @@ for(var row = 0; row < gridHeight; row++) {
             }
 
             input.classList.add("tableButton");
+
+            // Add this new button to the list of all buttons
+            mainButtons.push(input);
 
             newItem.appendChild(input);
         }
@@ -469,10 +474,32 @@ overlayDiv.onmousedown = function(event) {
     }
 }
 
+// For each keystroke in the selection search bar, do a search
 selectionSearchBar.onkeyup = function () {
     searchSelection();
 }
 
-function printSelectionData(){
-    console.log(selectionData);
+function importSelectionData(data) {
+    // Set selectionData to the new data
+    selectionData = data;
+
+    // Update all buttons to reflect the new data
+    for(var row = 0; row < selectionData.main.length; row++) {
+        for (var col = 0; col < selectionData.main[row].length; col++) {
+
+            // Convert row and column to one index
+            var button = mainButtons[row * selectionData.main[row].length + col];
+
+            // Remove any image if it exists
+            button.innerHTML = "";
+
+            // Create a new image if needed (if valid selection exists)
+            if(selectionData.main[row][col] != "") {
+                var img = document.createElement("img");
+                img.setAttribute("src", imagesLocation + selectionData.main[row][col]);
+                button.append(img);
+            }
+            
+        }
+    }
 }
