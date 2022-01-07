@@ -16,21 +16,39 @@
     </div>
     <div id="overlay" class="disabled">
         <div id="overlayContent" class ="overlayContent">
+
             <div id="selectionOverlayContent">
                 <h1 id="selectionHeader"> Menu </h1>
                 <input type="text" id="selectionSearchBar" placeholder="Search Name">
                 <div id="selectionGrid"></div>
             </div>
+
             <div id="outputOverlayContent">
                 <img src = "resources/template modified.png" id="mainOutputImage">
             </div>
+
+            <div id="ioOverlayContent">
+                <h1 id="ioHeader">Import / Export</h1>
+
+                <div class="ioDiv" id="exportMenuDiv">
+                    <textarea id="exportTextArea" rows="10" cols="70" placeholder="Click Export to get the data"></textarea>
+                    <button type="button" id="exportButton" >Export</button>
+                </div>
+        
+                <div class="ioDiv" id="importMenuDiv">
+                    <textarea id="importTextArea" rows="10" cols="70" placeholder="Paste data and click import"></textarea>
+                    <button type="button" id="importButton">Import</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <div id="mainGrid"></div>
-
-    <button type="button" id="submitButton">Generate</button>      
     
+    <button type="button" id="submitButton">Generate</button>      
+    <button type="button" id="ioButton">Import/Export</button>
+
 </div>
 
 <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>

@@ -15,8 +15,9 @@ const imagesLocation = "resources/images/";
 
 // ------------------------------------
 
-// Submit Button
 const submitButton = document.getElementById("submitButton");
+
+const ioButton = document.getElementById("ioButton");
 
 // The main grid
 const mainGrid = document.getElementById("mainGrid");
@@ -53,6 +54,10 @@ const mainOutputImage = document.getElementById("mainOutputImage");
 
 // ------------------------------------
 
+// Div that contains all I/O menu related elements
+const ioOverlayDiv = document.getElementById("ioOverlayContent");
+
+// ------------------------------------
 
 // Column headers of the table
 const colHeaders = 
@@ -390,6 +395,7 @@ function showSelectionOverlayContent() {
 
     // Hide the other overlay content
     outputOverlayDiv.classList.add("disabled");
+    ioOverlayDiv.classList.add("disabled");
     
     // Show the whole menu overlay
     showOverlay();
@@ -412,9 +418,28 @@ function showOutputOverlayContent() {
 
     // Hide the other overlay content
     selectionOverlayDiv.classList.add("disabled");
+    ioOverlayDiv.classList.add("disabled");
 
     // Show the whole menu overlay
     showOverlay();
+}
+
+function showIOOverlayContent() {
+    
+    // Show the overlay content
+    ioOverlayDiv.classList.remove("disabled");
+
+    // Hide the other overlay content
+    selectionOverlayDiv.classList.add("disabled");
+    outputOverlayDiv.classList.add("disabled");
+
+    // Show the whole menu overlay
+    showOverlay();
+
+}
+
+function showioOverlay() {
+    showIOOverlayContent();
 }
 
 // Shows the selection overlay
@@ -464,6 +489,10 @@ function showSelectionOverlay(input, row, col) {
 // Set Events
 submitButton.onclick = function() {
     renderImage();
+}
+
+ioButton.onclick = function() {
+    showioOverlay();
 }
 
 // Set up overlay click event
