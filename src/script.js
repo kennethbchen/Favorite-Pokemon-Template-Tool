@@ -57,6 +57,12 @@ const mainOutputImage = document.getElementById("mainOutputImage");
 // Div that contains all I/O menu related elements
 const ioOverlayDiv = document.getElementById("ioOverlayContent");
 
+const importButton = document.getElementById("importButton");
+const importTextArea = document.getElementById("importTextArea");
+
+const exportButton = document.getElementById("exportButton");
+const exportTextArea = document.getElementById("exportTextArea");
+
 // ------------------------------------
 
 // Column headers of the table
@@ -486,31 +492,13 @@ function showSelectionOverlay(input, row, col) {
     showSelectionOverlayContent();
 }
 
-// Set Events
-submitButton.onclick = function() {
-    renderImage();
-}
-
-ioButton.onclick = function() {
-    showioOverlay();
-}
-
-// Set up overlay click event
-// Only close the overlay if the background (and not the content of the menu) is clicked
-overlayDiv.onmousedown = function(event) {
-    if (event.target.id == "overlay") {
-        hideOverlay();
-    }
-}
-
-// For each keystroke in the selection search bar, do a search
-selectionSearchBar.onkeyup = function () {
-    searchSelection();
-}
-
 function importSelectionData(data) {
+    // Todo: input validation and sanitization?
+
     // Set selectionData to the new data
-    selectionData = data;
+    if (data != "") {
+        selectionData = data;
+    }
 
     // Update all buttons to reflect the new data
     for(var row = 0; row < selectionData.main.length; row++) {
@@ -532,3 +520,39 @@ function importSelectionData(data) {
         }
     }
 }
+
+// Set Events
+submitButton.onclick = function() {
+    renderImage();
+}
+
+ioButton.onclick = function() {
+
+    // Reset text areas
+    exportTextArea.value = "";
+    importTextArea.value = "";
+
+    showioOverlay();
+}
+
+// Set up overlay click event
+// Only close the overlay if the background (and not the content of the menu) is clicked
+overlayDiv.onmousedown = function(event) {
+    if (event.target.id == "overlay") {
+        hideOverlay();
+    }
+}
+
+// For each keystroke in the selection search bar, do a search
+selectionSearchBar.onkeyup = function() {
+    searchSelection();
+}
+
+exportButton.onclick = function() {
+    exportTextArea.value = JSON.stringify(selectionData);
+}
+
+importButton.onclick = function() {
+    importSelectionData(JSON.parse(importTextArea.value));
+}
+
